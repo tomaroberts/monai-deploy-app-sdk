@@ -5,7 +5,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from utils import (MyParser, run_cmd, run_cmd_quietly, set_up_logging,
+from src.utils import (MyParser, run_cmd, run_cmd_quietly, set_up_logging,
                    valid_dir_path, verify_image)
 
 

@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from spinner import ProgressSpinner
+from src.spinner import ProgressSpinner
 
 
 class MyParser(argparse.ArgumentParser):

@@ -157,11 +157,13 @@ def create_app_manifest(args, temp_dir):
         "input":
             {
                 "path": "{{input_dir}}",
+                "path_env": "MONAI_INPUTPATH",
                 "format": []
             }
         ,
         "output": {
             "path": "{{output_dir}}",
+            "path_env": "MONAI_OUTPUTPATH",
             "format": {
             }
         }
