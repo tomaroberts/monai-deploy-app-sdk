@@ -19,7 +19,10 @@ from .domain import Domain
 
 class DICOMSeries(Domain):
     
-    """DICOM Series represents a DICOM Series. It contains a collection of SOP Instances"""
+    """This class represents a DICOM Series. It contains a collection of SOP Instances. 
+     A series is a set of DICOM SOP Instances that were generated together by the same equipment 
+     at the same operation.
+    """
 
     def __init__(self, series_instance_uid):
         super().__init__(None)

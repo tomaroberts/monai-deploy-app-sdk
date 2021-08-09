@@ -21,7 +21,11 @@ from monai.deploy.operators.png_converter_operator import PNGConverterOperator
 
 
 class App(Application):
-
+    """
+    This applicatons demonstrates how a collection of DICOM Studies can be loaded
+    and then a single series from that study can be converted into a volumetric image
+    represented by an monai.deploy.core.domain.Image instance
+    """
 
     def compose(self):
 
