@@ -38,6 +38,7 @@ def create_package_parser(subparser: _SubParsersAction, command: str, parents: L
     parser.add_argument("--output-dir", "-o", type=str, help="Directory mounted in container for Application Output")
     parser.add_argument("--working-dir", "-w", type=str, help="Directory mounted in container for Application")
     parser.add_argument("--no-cache", "-n", action="store_true", help="Do not use cache when building image")
+    parser.add_argument("--model_registry", type=str, help="Use a model registry [supported options: 'mlflow']")
     parser.add_argument(
         "--requirements",
         "-r",

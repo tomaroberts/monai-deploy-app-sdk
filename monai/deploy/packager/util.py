@@ -71,6 +71,7 @@ def initialize_args(args: Namespace) -> Dict:
     processed_args["output_dir"] = args.output if args.output_dir else DefaultValues.OUTPUT_DIR
     processed_args["models_dir"] = args.models if args.models_dir else DefaultValues.MODELS_DIR
     processed_args["no_cache"] = args.no_cache
+    processed_args["model_registry"] = args.model_registry
     processed_args["timeout"] = args.timeout if args.timeout else DefaultValues.TIMEOUT
     processed_args["api-version"] = DefaultValues.API_VERSION
     processed_args["requirements"] = ""
@@ -82,6 +83,15 @@ def initialize_args(args: Namespace) -> Dict:
             )
         else:
             processed_args["requirements"] = args.requirements
+
+    # If using a registry, download specified model and replace args.models_dir
+    if args.model_registry:
+        from monai.deploy.core.registry import RegistryFactory
+        registry = RegistryFactory.create(registry_type=args.model_registry)
+        registry_model_path = registry.get_model(model_uri=args.model)
+
+        # replace models_dir with downloaded model from registry
+        processed_args["models_dir"] = registry_model_path
 
     # Verify proper base image:
     dockerfile_type = ""
@@ -143,6 +153,7 @@ def build_image(args: dict, temp_dir: str):
     application_path = args["application"]
     local_requirements_file = args["requirements"]
     no_cache = args["no_cache"]
+    model_registry = args["model_registry"]
     app_version = args["version"]
 
     # Copy application files to temp directory (under 'app' folder)
@@ -258,7 +269,7 @@ def build_image(args: dict, temp_dir: str):
 def create_app_manifest(args: Dict, temp_dir: str):
     """Creates Application manifest .json file
     Args:
-        args (Dict): Input arguements for Packager
+        args (Dict): Input arguments for Packager
         temp_dir (str): Temporary directory to build MAP
     """
     input_dir = args["input_dir"]
@@ -298,7 +309,7 @@ def create_app_manifest(args: Dict, temp_dir: str):
 def create_package_manifest(args: Dict, temp_dir: str):
     """Creates package manifest .json file
     Args:
-        args (Dict): Input arguements for Packager
+        args (Dict): Input arguments for Packager
         temp_dir (str): Temporary directory to build MAP
     """
     models_dir = args["models_dir"]
@@ -344,9 +355,9 @@ def package_application(args: Namespace):
     """Driver function for invoking all functions for creating and
     building the MONAI Application package image
     Args:
-        args (Namespace): Input arguements for Packager from CLI
+        args (Namespace): Input arguments for Packager from CLI
     """
-    # Initialize arguements for package
+    # Initialize arguments for package
     initialized_args = initialize_args(args)
 
     with tempfile.TemporaryDirectory(prefix="monai_tmp", dir=".") as temp_dir:
