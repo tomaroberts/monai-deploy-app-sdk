@@ -39,11 +39,11 @@ COMMON_FOOTPRINT = """
     RUN pip install --no-cache-dir --user -r {map_requirements_path}
 
     # Override monai-deploy-app-sdk module
-    COPY ./monai-deploy-app-sdk /root/.local/lib/python3.8/site-packages/monai/deploy/
+    COPY ./monai-deploy-app-sdk /root/.local/lib/python3.9/site-packages/monai/deploy/
     RUN echo "User site package location: $(python3 -m site --user-site)" \\
         && [ "$(python3 -m site --user-site)" != "/root/.local/lib/python3.8/site-packages" ] \\
         && mkdir -p $(python3 -m site --user-site)/monai/deploy \\
-        && cp -r /root/.local/lib/python3.8/site-packages/monai/deploy/* $(python3 -m site --user-site)/monai/deploy/ \\
+        && cp -r /root/.local/lib/python3.9/site-packages/monai/deploy/* $(python3 -m site --user-site)/monai/deploy/ \\
         || true
 
     COPY ./map/app.json /etc/monai/
@@ -78,16 +78,24 @@ UBUNTU_DOCKERFILE_TEMPLATE = (
      && apt upgrade -y --no-install-recommends \\
      && apt install -y --no-install-recommends \\
         build-essential \\
-        python3 \\
-        python3-pip \\
-        python3-setuptools \\
+        python3.9 \\
         curl \\
-        unzip \\
-     && apt autoremove -y \\
-     && rm -rf /var/lib/apt/lists/* \\
-     && rm -f /usr/bin/python /usr/bin/pip \\
-     && ln -s /usr/bin/python3 /usr/bin/python \\
-     && ln -s /usr/bin/pip3 /usr/bin/pip
+        unzip
+
+    # Install pip3.9
+    # See: https://stackoverflow.com/questions/65644782/how-to-install-pip-for-python-3-9-on-ubuntu-20-04
+    RUN apt install -y --no-install-recommends python3.9-distutils \
+        && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
+        && python3.9 get-pip.py \
+        && apt autoremove -y \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Remove Python3.8 and update symlinks to Python3.9 and pip3.9
+    RUN rm -f /bin/python3.8 /usr/bin/python3.8 /usr/bin/python3 \
+        && ln -s /usr/bin/python3.9 /usr/bin/python3 \
+        && ln -s /usr/bin/python3.9 /usr/bin/python \
+        && ln -s /usr/local/bin/pip /usr/bin/pip
+
     """
     + COMMON_FOOTPRINT
 )
